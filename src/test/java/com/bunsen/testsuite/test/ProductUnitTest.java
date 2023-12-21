@@ -2,7 +2,6 @@ package com.bunsen.testsuite.test;
 
 import com.bunsen.testsuite.model.Product;
 import com.bunsen.testsuite.service.ProductService;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
@@ -16,6 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,7 +34,7 @@ public class ProductUnitTest {
 
     @Test
     @Tag("positive")
-    public void testPositiveSave(){
+    public void testPositiveSave() {
         Product product = new Product();
         product.setProductCode("P1");
         product.setProductName("Prod1");
@@ -50,7 +50,7 @@ public class ProductUnitTest {
 
     @Test
     @Tag("negative")
-    public void testNegativeSave(){
+    public void testNegativeSave() {
         Product product = new Product();
         product.setProductCode("P1");
         product.setProductName("Prod1");
@@ -58,13 +58,13 @@ public class ProductUnitTest {
         product.setQuantity(-10);
         product.setPrice(BigDecimal.valueOf(-102.13));
         product.setDateAdded(LocalDate.now());
-        Assert.assertThrows(InvalidDataAccessApiUsageException.class,() -> productService.saveProduct(product));
+        Assert.assertThrows(InvalidDataAccessApiUsageException.class, () -> productService.saveProduct(product));
     }
 
     @Test
     @Tag("positive")
     @Sql("classpath:/insertData.sql")
-    public void testPositiveRead(){
+    public void testPositiveRead() {
         Optional<Product> product = productService.findProduct("P2");
 
         assertNotNull(product.get());
@@ -74,18 +74,21 @@ public class ProductUnitTest {
     @Test
     @Tag("negative")
     @Sql("classpath:/insertData.sql")
-    public void testNegativeRead(){
-        Assert.assertThrows(EntityNotFoundException.class, () -> productService.findProduct("P10"));
+    public void testNegativeRead() {
+        Optional<Product> foundProduct = productService.findProduct("P10");
+
+        // Check if the product is not present
+        assertFalse(foundProduct.isPresent());
     }
 
     @Test
     @Tag("positive")
     @Sql("classpath:/insertData.sql")
-    public void testPositiveGetAll(){
+    public void testPositiveGetAll() {
         List<Product> products = productService.getAllProducts();
 
         assertNotNull(products);
-        assertTrue(products.size()>=4);
+        assertTrue(products.size() >= 4);
     }
 
     /**
@@ -101,12 +104,13 @@ public class ProductUnitTest {
         assertNotNull(productsByDate);
         assertTrue(productsByDate.size() <= 3);
     }
+
     @Test
     @Tag("positive")
     @Sql("classpath:/insertData.sql")
     public void testPositiveUpdate() {
         Optional<Product> foundProduct = productService.findProduct("P2");
-        if(foundProduct.isPresent()) {
+        if (foundProduct.isPresent()) {
             Product product = foundProduct.get();
             product.setProductCode("P2");
             product.setProductName("Product Updated");
@@ -131,6 +135,27 @@ public class ProductUnitTest {
         }
     }
 
+    @Test
+    @Tag("negative")
+    @Sql("classpath:/insertData.sql")
+    public void testNegativeUpdate() {
+        // Attempt to find the non-existent product
+        Optional<Product> foundProduct = productService.findProduct("P100");
 
+        // Check if the product is not present before attempting to update
+        assertFalse(foundProduct.isPresent());
+
+        // Attempt to update the non-existent product and assert that EntityNotFoundException is thrown
+        assertThrows(NoSuchElementException.class, () -> {
+            Product product = foundProduct.get();  // This line should throw NoSuchElementException
+            product.setProductCode("P100");
+            product.setProductName("Product Updated");
+            product.setCategory("Cat2");
+            product.setQuantity(20);
+            product.setPrice(BigDecimal.valueOf(100.0));
+
+            productService.updateProduct(product);
+        });
+    }
 
 }

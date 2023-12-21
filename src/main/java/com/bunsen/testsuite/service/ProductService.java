@@ -39,16 +39,11 @@ public class ProductService {
     }
 
     public void deleteProduct(String productCode) {
-        if(findProduct(productCode).isPresent()){
-            productRepository.deleteById(productCode);
-        }
+        findProduct(productCode).ifPresent(product -> productRepository.deleteById(productCode));
     }
 
     public Optional<Product> findProduct(String productCode){
-        if(productRepository.findById(productCode).isPresent()){
-           return productRepository.findById(productCode);
-        }else{
-            throw new EntityNotFoundException("No product with that code");
-        }
+        Optional<Product> product= productRepository.findById(productCode);
+            return product;
     }
 }
