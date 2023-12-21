@@ -3,7 +3,6 @@ package com.bunsen.testsuite.test;
 import com.bunsen.testsuite.model.Product;
 import com.bunsen.testsuite.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -59,7 +58,7 @@ public class ProductUnitTest {
         product.setQuantity(-10);
         product.setPrice(BigDecimal.valueOf(-102.13));
         product.setDateAdded(LocalDate.now());
-        Assert.assertThrows(InvalidDataAccessApiUsageException.class, () -> productService.saveProduct(product));
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> productService.saveProduct(product));
     }
 
     @Test
