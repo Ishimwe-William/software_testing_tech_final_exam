@@ -39,7 +39,9 @@ public class ProductService {
     }
 
     public void deleteProduct(String productCode) {
-        findProduct(productCode).ifPresent(product -> productRepository.deleteById(productCode));
+        Product product = findProduct(productCode)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with code: " + productCode));
+        productRepository.deleteById(productCode);
     }
 
     public Optional<Product> findProduct(String productCode) {
