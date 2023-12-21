@@ -18,8 +18,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -101,5 +101,36 @@ public class ProductUnitTest {
         assertNotNull(productsByDate);
         assertTrue(productsByDate.size() <= 3);
     }
+    @Test
+    @Tag("positive")
+    @Sql("classpath:/insertData.sql")
+    public void testPositiveUpdate() {
+        Optional<Product> foundProduct = productService.findProduct("P2");
+        if(foundProduct.isPresent()) {
+            Product product = foundProduct.get();
+            product.setProductCode("P2");
+            product.setProductName("Product Updated");
+            product.setCategory("Cat2");
+            product.setQuantity(20);
+            product.setPrice(BigDecimal.valueOf(100.0));
+
+            // Update the product using the service
+            productService.updateProduct(product);
+
+            // Retrieve the updated product
+            Optional<Product> updatedProduct = productService.findProduct("P2");
+
+            assertTrue(updatedProduct.isPresent());
+            assertEquals(20, updatedProduct.get().getQuantity());
+
+            // Use compareTo to compare BigDecimal values
+            assertEquals(0, BigDecimal.valueOf(100.0).compareTo(updatedProduct.get().getPrice()));
+        } else {
+            // Fail the test if the product is not present
+            fail("Product not found for update.");
+        }
+    }
+
+
 
 }
