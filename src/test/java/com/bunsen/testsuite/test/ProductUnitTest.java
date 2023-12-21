@@ -4,6 +4,7 @@ import com.bunsen.testsuite.model.Product;
 import com.bunsen.testsuite.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 public class ProductUnitTest {
@@ -38,8 +42,8 @@ public class ProductUnitTest {
         product.setDateAdded(LocalDate.now());
 
         Product saveProduct = productService.saveProduct(product);
-        Assert.assertNotNull(saveProduct);
-        Assert.assertEquals("P1",saveProduct.getProductCode());
+        assertNotNull(saveProduct);
+        Assertions.assertEquals("P1", saveProduct.getProductCode());
     }
 
     @Test
@@ -62,8 +66,8 @@ public class ProductUnitTest {
     public void testPositiveRead(){
         Optional<Product> product = productService.findProduct("P2");
 
-        Assert.assertNotNull(product.get());
-        Assert.assertEquals("P2",product.get().getProductCode());
+        assertNotNull(product.get());
+        Assertions.assertEquals("P2", product.get().getProductCode());
     }
 
     @Test
@@ -79,10 +83,19 @@ public class ProductUnitTest {
     public void testPositiveGetAll(){
         List<Product> products = productService.getAllProducts();
 
-        Assert.assertNotNull(products);
-        Assert.assertTrue(products.size()>=4);
+        assertNotNull(products);
+        assertTrue(products.size()>=4);
     }
 
-    //
+    @Test
+    @Tag("positive")
+    @Sql("classpath:/insertData.sql")
+    public void testPositiveGetProductsByDate() {
+        LocalDate currentDate = LocalDate.now();
+        List<Product> productsByDate = productService.getProductsByDate(currentDate.minusDays(1));
+
+        assertNotNull(productsByDate);
+        assertTrue(productsByDate.size() <= 3);
+    }
 
 }

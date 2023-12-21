@@ -29,7 +29,7 @@ public class ProductService {
     }
 
     public List<Product> getProductsByDate(LocalDate date) {
-        return productRepository.findByDateAddedGreaterThan(date);
+        return productRepository.findByDateAddedBefore(date);
     }
 
     public void updateProduct(Product product) {
