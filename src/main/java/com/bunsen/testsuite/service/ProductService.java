@@ -33,7 +33,7 @@ public class ProductService {
     }
 
     public void updateProduct(Product product) {
-        if(findProduct(product.getProductCode()).isPresent()){
+        if (findProduct(product.getProductCode()).isPresent()) {
             productRepository.save(product);
         }
     }
@@ -42,8 +42,8 @@ public class ProductService {
         findProduct(productCode).ifPresent(product -> productRepository.deleteById(productCode));
     }
 
-    public Optional<Product> findProduct(String productCode){
-        Optional<Product> product= productRepository.findById(productCode);
-            return product;
+    public Optional<Product> findProduct(String productCode) {
+        Optional<Product> product = productRepository.findById(productCode);
+        return product;
     }
 }
