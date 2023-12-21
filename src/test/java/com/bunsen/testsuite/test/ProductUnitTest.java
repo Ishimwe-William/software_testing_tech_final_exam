@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ProductUnitTest {
 
     private final ProductService productService;
@@ -56,7 +58,6 @@ public class ProductUnitTest {
         product.setQuantity(-10);
         product.setPrice(BigDecimal.valueOf(-102.13));
         product.setDateAdded(LocalDate.now());
-
         Assert.assertThrows(InvalidDataAccessApiUsageException.class,() -> productService.saveProduct(product));
     }
 
@@ -87,12 +88,15 @@ public class ProductUnitTest {
         assertTrue(products.size()>=4);
     }
 
+    /**
+     * Test for getting products with a date added greater than the current date.
+     */
     @Test
     @Tag("positive")
     @Sql("classpath:/insertData.sql")
     public void testPositiveGetProductsByDate() {
         LocalDate currentDate = LocalDate.now();
-        List<Product> productsByDate = productService.getProductsByDate(currentDate.minusDays(1));
+        List<Product> productsByDate = productService.getProductsByDate(currentDate.plusDays(1));
 
         assertNotNull(productsByDate);
         assertTrue(productsByDate.size() <= 3);

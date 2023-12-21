@@ -13,7 +13,7 @@ import org.junit.platform.suite.api.Suite;
 
 @Suite
 @SelectClasses({ProductUnitTest.class})
-@ExcludeTags("positive")
+//@ExcludeTags("negative")
 //@SelectPackages({"com.bunsen.testsuite.test"})
 //@IncludePackages("com.bunsen.testsuite.test.positive")
 //@ExcludePackages("com.bunsen.testsuite.test.negative")
