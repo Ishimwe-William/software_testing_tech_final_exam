@@ -1,10 +1,10 @@
-package com.bunsen.testsuite;
+package com.bunsen.customermanagement23722;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TestSuiteApplicationTests {
+class ApplicationTests {
 
     @Test
     void contextLoads() {
